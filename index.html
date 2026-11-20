@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#05080e">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>SU CITY · Deniz Şehri · v38</title>
+    <title>SU CITY · Deniz Şehri · v39</title>
     <style>
         html, body { margin: 0; padding: 0; overflow: hidden; background: #000; }
         canvas { display: block; touch-action: none; }
@@ -86,7 +86,8 @@ canvas{touch-action:none}
                 float l = dot( c, vec3( 0.2126, 0.7152, 0.0722 ) );
                 vec3 shadowTint = vec3( 0.93, 0.99, 1.07 ), lightTint = vec3( 1.035, 1.0, 0.955 );
                 c *= mix( shadowTint, lightTint, smoothstep( 0.08, 0.72, l ) );
-                c = mix( vec3( l ), c, 1.04 );
+                c = mix( vec3( l ), c, 1.07 );
+                c = mix( c, c * c * ( 3.0 - 2.0 * c ), 0.14 ); // v39 · yumuşak sinematik kontrast (eserlere dokunmaz)
                 return clamp( c + vec3( 0.004, 0.006, 0.009 ) * ( 1.0 - l ), 0.0, 1.0 );
             }`);
 
@@ -5526,8 +5527,8 @@ canvas{touch-action:none}
                 if (airborne && !SW.air) { SW.air = true; BR.dove = true; BR.surfT = 0; }
                 if (!airborne && SW.air && inWater) { SW.air = false; SW.entryT = 0; }
                 SW.entryT += dt;
-                [G.swim, G.swimV] = smoothDamp(G.swim, (inWater || airborne) ? 1 : 0, G.swimV, airborne ? .12 : .3, dt);
-                [G.prone, G.proneV] = smoothDamp(G.prone, airborne ? 1 : sstep(.3, 1.3, spd), G.proneV, .45, dt);
+                [G.swim, G.swimV] = smoothDamp(G.swim, (inWater || airborne) ? 1 : 0, G.swimV, airborne ? .12 : (MOVE.onDeck ? .1 : .3), dt); // v39 · yola çıkınca anında dik
+                [G.prone, G.proneV] = smoothDamp(G.prone, airborne ? 1 : MOVE.onDeck ? 0 : sstep(.3, 1.3, spd), G.proneV, MOVE.onDeck ? .1 : .45, dt);
                 if (G.swim > .002) {
                     const sw = G.swim, prn = G.prone, tr = 1 - prn;
                     // stil seçimi: koşarken serbest; uzun yüzüşte arada stil değişir (geçişte kısa bir süzülüş)
